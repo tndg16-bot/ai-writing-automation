@@ -3,10 +3,10 @@
 from typing import Any
 
 from ai_writing.core.context import GenerationContext, Section
-from ai_writing.stages.base import BaseStage
 from ai_writing.core.exceptions import AIWritingError
+from ai_writing.services.image.base import ImageGenerationResult, ImageGeneratorFactory
+from ai_writing.stages.base import BaseStage
 from ai_writing.utils.prompt_loader import PromptLoader
-from ai_writing.services.image.base import ImageGeneratorFactory, ImageGenerationResult
 
 
 class ImageGenerationStage(BaseStage):
@@ -68,7 +68,6 @@ class ImageGenerationStage(BaseStage):
             return context
 
         # APIキーを環境変数から取得
-        import os
         from ai_writing.core.config import EnvSettings
 
         env_settings = EnvSettings()

@@ -2,9 +2,9 @@
 
 from typing import Any
 
-import httpx
 import google.generativeai as genai
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+import httpx
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from ai_writing.services.image.base import BaseImageGenerator, ImageGenerationResult
 from ai_writing.services.image.cache import ImageCache
@@ -92,7 +92,7 @@ class GeminiGenerator(BaseImageGenerator):
 
             return result
 
-        except Exception as e:
+        except Exception:
             raise
 
     async def generate_with_cache(

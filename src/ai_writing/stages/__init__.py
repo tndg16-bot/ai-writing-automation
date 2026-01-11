@@ -1,1 +1,2 @@
-"""Stages module - パイプラインの各ステージ"""
+"""Stages module for content generation"""
+from .base import BaseStage

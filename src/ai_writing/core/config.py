@@ -93,7 +93,11 @@ class EnvSettings(BaseSettings):
     google_api_key: str = ""
     google_client_id: str = ""
     google_client_secret: str = ""
+    google_redirect_uri: str = ""
+    midjourney_token: str = ""
+    canva_api_key: str = ""
 
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
+        extra = "ignore"

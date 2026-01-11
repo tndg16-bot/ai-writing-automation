@@ -53,3 +53,9 @@ class PipelineError(AIWritingError):
     """パイプライン実行エラー"""
 
     pass
+
+
+class StageError(AIWritingError):
+    """ステージ実行エラー"""
+
+    pass

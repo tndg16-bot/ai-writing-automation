@@ -1,4 +1,5 @@
 """CLI エントリーポイント"""
+import asyncio
 
 from pathlib import Path
 from typing import Optional
@@ -12,6 +13,36 @@ app = typer.Typer(
     help="AIライティング自動化ツール - キーワードからGoogle Docs完成稿まで",
 )
 console = Console()
+
+
+def _generate_markdown(context) -> str:
+    """コンテキストからMarkdownを生成"""
+    lines = []
+
+    # タイトル
+    if context.selected_title:
+        lines.append(f"# {context.selected_title}")
+        lines.append("")
+
+    # リード文
+    if context.lead:
+        lines.append(context.lead)
+        lines.append("")
+
+    # セクション
+    for section in context.sections:
+        lines.append(f"## {section.heading}")
+        lines.append("")
+        lines.append(section.content)
+        lines.append("")
+
+    # まとめ
+    if context.summary:
+        lines.append("## まとめ")
+        lines.append("")
+        lines.append(context.summary)
+
+    return "\n".join(lines)
 
 
 @app.command()
@@ -48,8 +79,43 @@ def generate(
         console.print("\n[yellow]ドライラン: 実行をスキップしました[/yellow]")
         return
 
-    # TODO: パイプライン実行
-    console.print("\n[red]未実装: パイプライン実行[/red]")
+    try:
+        # 設定を読み込み
+        from ai_writing.core.config import Config, EnvSettings
+        from ai_writing.pipeline.blog import BlogPipeline
+
+        config = Config.load("config/config.yaml")
+
+        # クライアント設定をマージ
+        if client != "default":
+            client_config_path = Path("config/clients") / f"{client}.yaml"
+            config = Config.load_with_client("config/config.yaml", client_config_path)
+
+        # パイプライン初期化
+        if content_type == "blog":
+            pipeline = BlogPipeline(config)
+        else:
+            console.print(f"\n[red]エラー: 未対応のコンテンツタイプ '{content_type}'[/red]")
+            raise typer.Exit(1)
+
+        # パイプライン実行
+        console.print("\n[bold]パイプライン実行中...[/bold]")
+        context = asyncio.run(pipeline.run(keyword))
+
+        # Markdown出力生成
+        markdown = _generate_markdown(context)
+
+        # 結果を保存または表示
+        if output:
+            output.write_text(markdown, encoding="utf-8")
+            console.print(f"\n[green]✓[/green] 出力を保存しました: {output}")
+        else:
+            console.print("\n[bold]生成結果:[/bold]")
+            console.print(Panel(markdown, title="Markdown Output"))
+
+    except Exception as e:
+        console.print(f"\n[red]エラー: {e}[/red]")
+        raise typer.Exit(1)
 
 
 @app.command()

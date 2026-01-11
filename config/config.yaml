@@ -1,0 +1,33 @@
+# AI Writing Automation - メイン設定
+
+llm:
+  provider: "openai"
+  model: "gpt-4"
+  temperature: 0.7
+  max_tokens: 4096
+
+image:
+  default_provider: "dalle"
+  providers:
+    dalle:
+      enabled: true
+      model: "dall-e-3"
+    gemini:
+      enabled: true
+      model: "imagen-3"
+    midjourney:
+      enabled: false
+    canva:
+      enabled: false
+
+image_insertion:
+  after_h2: true
+  after_lead: true
+  before_summary: false
+  custom_positions: []
+
+google_docs:
+  template_folder: "./templates"
+  output_folder_id: null  # Google DriveフォルダID
+
+prompts_folder: "./prompts"

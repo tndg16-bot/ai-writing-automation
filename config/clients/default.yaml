@@ -1,0 +1,17 @@
+# デフォルトクライアント設定
+
+client:
+  name: "default"
+
+content:
+  type: "blog"
+
+image_insertion:
+  after_h2: true
+  after_lead: true
+  before_summary: false
+  custom_positions: []
+
+tone:
+  formality: "casual"  # casual | formal
+  target_age: "30s"

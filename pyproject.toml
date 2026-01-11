@@ -36,6 +36,10 @@ dependencies = [
     "pyyaml>=6.0.0",
     "tenacity>=8.2.0",
     "python-dotenv>=1.0.0",
+    "google-generativeai>=0.5.0",
+    "diskcache>=5.6.0",
+    "pillow>=10.0.0",
+    "aiofiles>=23.0.0",
 ]
 
 [project.optional-dependencies]

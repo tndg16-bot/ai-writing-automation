@@ -9,6 +9,7 @@ from ai_writing.stages.title import TitleStage
 from ai_writing.stages.lead import LeadStage
 from ai_writing.stages.body import BodyStage
 from ai_writing.stages.summary import SummaryStage
+from ai_writing.stages.image_generation import ImageGenerationStage
 
 
 class BlogPipeline(BasePipeline):
@@ -18,7 +19,7 @@ class BlogPipeline(BasePipeline):
 
     def _build_stages(self) -> list:
         """ブログ生成ステージを構築"""
-        return [
+        stages = [
             SearchIntentStage(self.config),
             StructureStage(self.config),
             TitleStage(self.config),
@@ -26,3 +27,9 @@ class BlogPipeline(BasePipeline):
             BodyStage(self.config),
             SummaryStage(self.config),
         ]
+
+        # 画像生成はデフォルトでは無効（クライアント設定で有効化）
+        # 注: 実際の有効/無効はクライアント設定または環境変数で制御
+        # ImageGenerationStage 内部でチェックされる
+
+        return stages

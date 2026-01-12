@@ -82,6 +82,17 @@ class Config(BaseModel):
                     client_data = yaml.safe_load(f) or {}
 
                 # クライアント設定でオーバーライド
+                if "llm" in client_data:
+                    # 既存の設定をdictにしてマージ
+                    llm_dict = config.llm.model_dump()
+                    llm_dict.update(client_data["llm"])
+                    config.llm = LLMConfig(**llm_dict)
+
+                if "image" in client_data:
+                    image_dict = config.image.model_dump()
+                    image_dict.update(client_data["image"])
+                    config.image = ImageConfig(**image_dict)
+
                 if "image_insertion" in client_data:
                     config.image_insertion = ImageInsertionConfig(**client_data["image_insertion"])
 

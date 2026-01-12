@@ -37,7 +37,14 @@ class GeminiGenerator(BaseImageGenerator):
         self.cache = cache or ImageCache()
         self.model = model
         self.max_retries = max_retries
-        genai.configure(api_key=api_key)
+        self.model = model
+        self.max_retries = max_retries
+        
+        if api_key:
+            genai.configure(api_key=api_key)
+        else:
+            # APIキーがない場合は警告を出して設定をスキップ（生成時にエラーになる）
+            pass
 
     @retry(
         stop=stop_after_attempt(3),

@@ -27,7 +27,7 @@ class BlogPipeline(BasePipeline):
             LeadStage(self.config),
             BodyStage(self.config),
             SummaryStage(self.config),
-            DocsOutputStage(self.config),
+            # DocsOutputStage(self.config),  # Google認証が必要なため一時無効
         ]
 
         # 画像生成はデフォルトでは無効（クライアント設定で有効化）

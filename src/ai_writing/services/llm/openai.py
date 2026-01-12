@@ -29,6 +29,7 @@ class OpenAILLM(BaseLLM):
             api_key=api_key or os.getenv("OPENAI_API_KEY") or "dummy",
             base_url=base_url
         )
+        print(f"DEBUG: OpenAILLM initialized with base_url={base_url}, api_key={api_key[:4] + '***' if api_key else 'None'}")
 
     @retry(
         stop=stop_after_attempt(3),
@@ -77,7 +78,7 @@ class OpenAILLM(BaseLLM):
 
         # システムプロンプトにJSON指示を追加
         base_system = system_prompt or ""
-        json_instruction = "\n\nYou must respond with valid JSON only. No additional text."
+        json_instruction = "\n\nYou must respond with valid JSON only. No additional text before or after the JSON. Do not use markdown code blocks."
         messages.append({"role": "system", "content": base_system + json_instruction})
 
         messages.append({"role": "user", "content": prompt})
@@ -88,18 +89,37 @@ class OpenAILLM(BaseLLM):
                 messages=messages,
                 temperature=kwargs.get("temperature", self.temperature),
                 max_tokens=kwargs.get("max_tokens", self.max_tokens),
-                response_format={"type": "json_object"},
+                # response_format removed for Ollama compatibility
             )
 
             content = response.choices[0].message.content
             if content is None:
                 raise LLMResponseError("Empty response from OpenAI")
 
+            # JSONを抽出（マークダウンコードブロック対応）
+            content = content.strip()
+            
+            # ```json ... ``` 形式の場合は抽出
+            if content.startswith("```"):
+                lines = content.split("\n")
+                # 最初と最後の```を除去
+                json_lines = []
+                in_block = False
+                for line in lines:
+                    if line.startswith("```") and not in_block:
+                        in_block = True
+                        continue
+                    elif line.startswith("```") and in_block:
+                        break
+                    elif in_block:
+                        json_lines.append(line)
+                content = "\n".join(json_lines)
+            
             # JSONをパース
             try:
                 return json.loads(content)
             except json.JSONDecodeError as e:
-                raise LLMResponseError(f"Failed to parse JSON response: {e}") from e
+                raise LLMResponseError(f"Failed to parse JSON response: {e}\nContent: {content[:200]}") from e
 
         except LLMResponseError:
             raise

@@ -30,7 +30,7 @@ async def test_base_pipeline_run_with_context():
         mock_llm_factory.create.return_value = mock_llm
 
         pipeline = BlogPipeline(config)
-        assert len(pipeline.stages) == 6
+        assert len(pipeline.stages) == 7  # SearchIntent, Structure, Title, Lead, Body, Summary, DocsOutput
         assert pipeline.content_type == "blog"
         assert pipeline.config == config
 

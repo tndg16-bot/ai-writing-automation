@@ -1,0 +1,94 @@
+{
+  "title": "{{ selected_title or 'AIライティング記事' }}",
+  "sections": [
+    {
+      "type": "heading",
+      "level": 1,
+      "text": "{{ selected_title or 'AIライティング記事' }}"
+    },
+    {
+      "type": "paragraph",
+      "text": "\n"
+    },
+    {
+      "type": "paragraph",
+      "text": "{{ lead or '' }}"
+    },
+    {
+      "type": "paragraph",
+      "text": "\n\n"
+    },
+    {
+      "type": "loop",
+      "variable": "sections",
+      "item_name": "section",
+      "sections": [
+        {
+          "type": "heading",
+          "level": 2,
+          "text": "{{ section.heading }}"
+        },
+        {
+          "type": "paragraph",
+          "text": "\n"
+        },
+        {
+          "type": "paragraph",
+          "text": "{{ section.content }}"
+        },
+        {
+          "type": "loop",
+          "variable": "section.subsections",
+          "item_name": "subsection",
+          "sections": [
+            {
+              "type": "heading",
+              "level": 3,
+              "text": "{{ subsection.heading }}"
+            },
+            {
+              "type": "paragraph",
+              "text": "\n"
+            },
+            {
+              "type": "paragraph",
+              "text": "{{ subsection.content }}"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "text": "\n"
+        },
+        {
+          "type": "image",
+          "path": "{{ section.image_path }}",
+          "width": 500,
+          "height": 350,
+          "condition": "{{ section.image_path }}"
+        },
+        {
+          "type": "paragraph",
+          "text": "\n\n"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "まとめ"
+    },
+    {
+      "type": "paragraph",
+      "text": "\n"
+    },
+    {
+      "type": "paragraph",
+      "text": "{{ summary or '' }}"
+    },
+    {
+      "type": "paragraph",
+      "text": "\n\n---\n\nこの記事はAIで自動生成されました。\n"
+    }
+  ]
+}

@@ -113,6 +113,12 @@ def generate(
             console.print("\n[bold]生成結果:[/bold]")
             console.print(Panel(markdown, title="Markdown Output"))
 
+        # Google Docs URL を表示（生成された場合）
+        if "docs_url" in context.client_config:
+            console.print(
+                f"\n[blue]📄 Google Docs: {context.client_config['docs_url']}[/blue]"
+            )
+
     except Exception as e:
         console.print(f"\n[red]エラー: {e}[/red]")
         raise typer.Exit(1)

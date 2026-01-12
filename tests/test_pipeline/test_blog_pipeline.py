@@ -12,6 +12,9 @@ from ai_writing.core.config import Config
 LLM_FACTORY_PATCH = "ai_writing.services.llm.base.LLMFactory"
 
 
+DOCS_STAGE_INIT_SERVICES_PATCH = "ai_writing.stages.docs_output.DocsOutputStage._initialize_services"
+
+
 @pytest.fixture
 def mock_config(prompts_path: Path):
     """モック設定"""
@@ -22,6 +25,7 @@ def mock_config(prompts_path: Path):
     config.llm.temperature = 0.7
     config.llm.max_tokens = 4096
     config.prompts_folder = prompts_path
+    config.google_docs = {"template_folder": "templates"}
     return config
 
 
@@ -33,7 +37,7 @@ async def test_blog_pipeline_initialization(mock_config):
     pipeline = BlogPipeline(mock_config)
 
     assert pipeline.content_type == "blog"
-    assert len(pipeline.stages) == 6
+    assert len(pipeline.stages) == 7  # 6 original + DocsOutputStage
     assert pipeline.config == mock_config
 
 
@@ -53,6 +57,7 @@ async def test_blog_pipeline_build_stages_order(mock_config):
         "LeadStage",
         "BodyStage",
         "SummaryStage",
+        "DocsOutputStage",
     ]
 
     assert stage_names == expected_order
@@ -94,19 +99,29 @@ async def test_blog_pipeline_full_execution(mock_config):
             "AI副業は初心者でも始めやすいビジネスです。ChatGPTを活用することで、効率的に収入を得ることができます。まずは小さな案件から始めて、徐々にスキルと収入を増やしていきましょう。",
         ])
 
-        pipeline = BlogPipeline(mock_config)
-        result = await pipeline.run("AI副業")
+        # DocsOutputStageをモック（Google APIを使わない）
+        with patch(DOCS_STAGE_INIT_SERVICES_PATCH):
+            from ai_writing.stages.docs_output import DocsOutputStage
 
-        # コンテキストの検証
-        assert result.keyword == "AI副業"
-        assert result.persona == "30代男性、会社員"
-        assert result.needs_explicit == ["AIで稼ぎたい"]
-        assert result.needs_latent == ["時間の自由を得たい"]
-        assert len(result.titles) > 0
-        assert result.selected_title is not None
-        assert result.lead is not None
-        assert len(result.sections) > 0
-        assert result.summary is not None
+            pipeline = BlogPipeline(mock_config)
+
+            # DocsOutputStageの_rendererをモック
+            docs_stage = pipeline.stages[-1]
+            docs_stage._renderer = MagicMock()
+            docs_stage._renderer.render_to_docs.return_value = "https://docs.google.com/test"
+
+            result = await pipeline.run("AI副業")
+
+            # コンテキストの検証
+            assert result.keyword == "AI副業"
+            assert result.persona == "30代男性、会社員"
+            assert result.needs_explicit == ["AIで稼ぎたい"]
+            assert result.needs_latent == ["時間の自由を得たい"]
+            assert len(result.titles) > 0
+            assert result.selected_title is not None
+            assert result.lead is not None
+            assert len(result.sections) > 0
+            assert result.summary is not None
 
 
 @pytest.mark.asyncio
@@ -135,16 +150,26 @@ async def test_blog_pipeline_context_accumulation(mock_config):
             "テストまとめ",
         ])
 
-        pipeline = BlogPipeline(mock_config)
-        result = await pipeline.run("テスト")
+        # DocsOutputStageをモック（Google APIを使わない）
+        with patch(DOCS_STAGE_INIT_SERVICES_PATCH):
+            from ai_writing.stages.docs_output import DocsOutputStage
 
-        # 各ステージでコンテキストが正しく更新されているか確認
-        assert result.persona is not None
-        assert len(result.structure) > 0
-        assert len(result.titles) > 0
-        assert result.lead is not None
-        assert len(result.sections) > 0
-        assert result.summary is not None
+            pipeline = BlogPipeline(mock_config)
+
+            # DocsOutputStageの_rendererをモック
+            docs_stage = pipeline.stages[-1]
+            docs_stage._renderer = MagicMock()
+            docs_stage._renderer.render_to_docs.return_value = "https://docs.google.com/test"
+
+            result = await pipeline.run("テスト")
+
+            # 各ステージでコンテキストが正しく更新されているか確認
+            assert result.persona is not None
+            assert len(result.structure) > 0
+            assert len(result.titles) > 0
+            assert result.lead is not None
+            assert len(result.sections) > 0
+            assert result.summary is not None
 
 
 @pytest.mark.asyncio

@@ -10,6 +10,7 @@ from ai_writing.stages.lead import LeadStage
 from ai_writing.stages.body import BodyStage
 from ai_writing.stages.summary import SummaryStage
 from ai_writing.stages.image_generation import ImageGenerationStage
+from ai_writing.stages.docs_output import DocsOutputStage
 
 
 class BlogPipeline(BasePipeline):
@@ -26,6 +27,7 @@ class BlogPipeline(BasePipeline):
             LeadStage(self.config),
             BodyStage(self.config),
             SummaryStage(self.config),
+            DocsOutputStage(self.config),
         ]
 
         # 画像生成はデフォルトでは無効（クライアント設定で有効化）

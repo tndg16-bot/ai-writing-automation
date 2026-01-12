@@ -54,6 +54,7 @@ dmypy.json
 # Project specific
 config/clients/*.yaml
 !config/clients/default.yaml
+!config/clients/ollama.yaml
 credentials/
 *.json
 !templates/*.json

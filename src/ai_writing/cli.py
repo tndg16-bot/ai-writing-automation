@@ -83,6 +83,8 @@ def generate(
         # 設定を読み込み
         from ai_writing.core.config import Config, EnvSettings
         from ai_writing.pipeline.blog import BlogPipeline
+        from ai_writing.pipeline.youtube import YouTubePipeline
+        from ai_writing.pipeline.yukkuri import YukkuriPipeline
 
         config = Config.load("config/config.yaml")
 
@@ -94,6 +96,10 @@ def generate(
         # パイプライン初期化
         if content_type == "blog":
             pipeline = BlogPipeline(config)
+        elif content_type == "youtube":
+            pipeline = YouTubePipeline(config)
+        elif content_type == "yukkuri":
+            pipeline = YukkuriPipeline(config)
         else:
             console.print(f"\n[red]エラー: 未対応のコンテンツタイプ '{content_type}'[/red]")
             raise typer.Exit(1)

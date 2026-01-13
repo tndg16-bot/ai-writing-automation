@@ -15,6 +15,8 @@ class LLMConfig(BaseModel):
     model: str = "gpt-4"
     temperature: float = 0.7
     max_tokens: int = 4096
+    base_url: str | None = None
+    api_key: str | None = None
 
 
 class ImageProviderConfig(BaseModel):

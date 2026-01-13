@@ -54,5 +54,18 @@ class LLMFactory:
             from ai_writing.services.llm.openai import OpenAILLM
 
             return OpenAILLM(**config)
+            
+        elif provider == "ollama":
+            from ai_writing.services.llm.openai import OpenAILLM
+            
+            # Ollama defaults
+            ollama_config = config.copy()
+            if "base_url" not in ollama_config or not ollama_config["base_url"]:
+                ollama_config["base_url"] = "http://localhost:11434/v1"
+            if "api_key" not in ollama_config:
+                ollama_config["api_key"] = "ollama"  # Dummy key required
+                
+            return OpenAILLM(**ollama_config)
+            
         else:
             raise ValueError(f"Unknown LLM provider: {provider}")

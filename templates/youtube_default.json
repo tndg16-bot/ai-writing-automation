@@ -1,0 +1,68 @@
+{
+  "title": "{{ selected_title or 'YouTube動画台本' }}",
+  "sections": [
+    {
+      "type": "heading",
+      "level": 1,
+      "text": "{{ selected_title or 'YouTube動画台本' }}"
+    },
+    {
+      "type": "paragraph",
+      "text": "\n"
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "冒頭"
+    },
+    {
+      "type": "paragraph",
+      "text": "\n"
+    },
+    {
+      "type": "paragraph",
+      "text": "{{ intro or '' }}"
+    },
+    {
+      "type": "paragraph",
+      "text": "\n\n"
+    },
+    {
+      "type": "loop",
+      "variable": "sections",
+      "item_name": "section",
+      "sections": [
+        {
+          "type": "heading",
+          "level": 2,
+          "text": "{{ section.heading }}"
+        },
+        {
+          "type": "paragraph",
+          "text": "\n"
+        },
+        {
+          "type": "paragraph",
+          "text": "{{ section.content }}"
+        },
+        {
+          "type": "paragraph",
+          "text": "\n\n"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "level": 2,
+      "text": "エンディング"
+    },
+    {
+      "type": "paragraph",
+      "text": "\n"
+    },
+    {
+      "type": "paragraph",
+      "text": "{{ ending or '' }}"
+    }
+  ]
+}

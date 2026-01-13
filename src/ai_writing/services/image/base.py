@@ -105,5 +105,13 @@ class ImageGeneratorFactory:
             from ai_writing.services.image.gemini import GeminiGenerator
 
             return GeminiGenerator(**config)
+        elif provider == "midjourney":
+            from ai_writing.services.image.midjourney import MidjourneyGenerator
+
+            return MidjourneyGenerator(**config)
+        elif provider == "canva":
+            from ai_writing.services.image.canva import CanvaGenerator
+
+            return CanvaGenerator(**config)
         else:
             raise ValueError(f"Unknown image generation provider: {provider}")

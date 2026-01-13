@@ -20,11 +20,15 @@ class OpenAILLM(BaseLLM):
         temperature: float = 0.7,
         max_tokens: int = 4096,
         api_key: str | None = None,
+        base_url: str | None = None,
     ):
         self.model = model
         self.temperature = temperature
         self.max_tokens = max_tokens
-        self.client = AsyncOpenAI(api_key=api_key or os.getenv("OPENAI_API_KEY"))
+        self.client = AsyncOpenAI(
+            api_key=api_key or os.getenv("OPENAI_API_KEY") or "dummy",
+            base_url=base_url
+        )
 
     @retry(
         stop=stop_after_attempt(3),

@@ -42,9 +42,9 @@
 - [ ] Gemini API キー設定（オプション）
 
 #### P0-4: 開発環境
-- [ ] pytest 設定
-- [ ] pre-commit hooks 設定（black, ruff）
-- [ ] CI/CD 基盤（GitHub Actions）
+- [x] pytest 設定
+- [x] pre-commit hooks 設定（black, ruff）
+- [x] CI/CD 基盤（GitHub Actions）
 
 ---
 
@@ -261,6 +261,15 @@ ai-writing-automation/
 
 ## 次のアクション
 
-1. **今すぐ**: GitHub リポジトリ作成
-2. **本日中**: Phase 0 完了
-3. **今週中**: Phase 1 完了（ブログ生成MVP）
+1. **✅ 完了**: GitHub リポジトリ作成
+2. **✅ 完了**: Phase 0 完了
+3. **✅ 完了**: Phase 1 完了（ブログ生成MVP）
+4. **✅ 完了**: Phase 2 完了（画像生成）
+5. **✅ 完了**: Phase 3 完了（Google Docs出力）
+6. **✅ 完了**: Phase 4 完了（YouTube/ゆっくり対応）
+7. **🔄 進行中**: Phase 5 完了（拡張・最適化）
+   - [x] Midjourney連携
+   - [x] Canva連携
+   - [x] 履歴・バージョン管理
+   - [ ] Web UI実装（将来）
+   - [ ] 並列生成実装（将来）

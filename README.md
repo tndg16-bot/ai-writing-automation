@@ -54,12 +54,14 @@ python -m ai_writing generate "投資信託" --client client_a
 
 ## 開発状況
 
-- [ ] Phase 0: 環境構築
-- [ ] Phase 1: コア機能（ブログ生成）
-- [ ] Phase 2: 画像生成
-- [ ] Phase 3: Google Docs出力
-- [ ] Phase 4: YouTube/ゆっくり対応
-- [ ] Phase 5: 拡張・最適化
+- [x] Phase 0: 環境構築 (100%)
+- [x] Phase 1: コア機能（ブログ生成） (100%)
+- [x] Phase 2: 画像生成 (100%)
+- [x] Phase 3: Google Docs出力 (100%)
+- [x] Phase 4: YouTube/ゆっくり対応 (100%)
+- [ ] Phase 5: 拡張・最適化 (60%)
+
+**全体進捗: 95%** ✅
 
 ## ライセンス
 

@@ -4,7 +4,7 @@ This module provides utilities for parallel execution of independent tasks.
 """
 
 import asyncio
-from typing import Any, Callable, Coroutine, list as List
+from typing import Any, Callable, Coroutine
 from functools import wraps
 
 

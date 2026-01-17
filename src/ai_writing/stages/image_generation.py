@@ -2,11 +2,17 @@
 
 from typing import Any
 
+from rich.console import Console
+
 from ai_writing.core.context import GenerationContext, Section
-from ai_writing.core.exceptions import AIWritingError
+from ai_writing.core.exceptions import AIWritingError, ImageGenerationError
 from ai_writing.services.image.base import ImageGenerationResult, ImageGeneratorFactory
 from ai_writing.stages.base import BaseStage
 from ai_writing.utils.prompt_loader import PromptLoader
+
+console = Console()
+
+console = Console()
 
 
 class ImageGenerationStage(BaseStage):
@@ -22,7 +28,7 @@ class ImageGenerationStage(BaseStage):
         self,
         sections: list[Section],
         image_config: dict[str, Any],
-    ) -> dict[int, str]:
+    ) -> dict[int, Section]:
         """画像挿入位置を計算
 
         Args:
@@ -30,7 +36,7 @@ class ImageGenerationStage(BaseStage):
             image_config: 画像生成設定
 
         Returns:
-            {セクションインデックス: 画像生成プロンプト} のマップ
+            {セクションインデックス: Section} のマップ
         """
         insertion_rules = image_config.get("insertion_rules", {})
         positions = {}
@@ -57,14 +63,21 @@ class ImageGenerationStage(BaseStage):
         image_config = context.client_config.get("image_generation", {})
 
         if not image_config.get("enabled", False):
-            print("  画像生成: スキップ（無効）")
+            console.print("  [dim]🖼️ 画像生成: スキップ（無効）[/dim]")
             return context
 
         # 挿入ルールを計算
         positions = self._calculate_insertion_positions(context.sections, image_config)
 
         if not positions:
-            print("  画像生成: 挿入位置なし")
+            console.print("  [dim]🖼️ 画像生成: 挿入位置なし[/dim]")
+            return context
+
+        # 挿入ルールを計算
+        positions = self._calculate_insertion_positions(context.sections, image_config)
+
+        if not positions:
+            console.print("  [dim]🖼️ 画像生成: 挿入位置なし[/dim]")
             return context
 
         # APIキーを環境変数から取得
@@ -95,23 +108,30 @@ class ImageGenerationStage(BaseStage):
 
         # 各位置で画像を生成
         images = []
-        for idx, section in positions.items():
+        total_images = len(positions)
+
+        console.print(f"  [cyan]🖼️ {total_images}枚の画像を生成中...[/cyan]")
+
+        for i, (idx, section) in enumerate(positions.items(), 1):
             try:
+                console.print(f"    [dim]→ {i}/{total_images}: {section.heading}[/dim]")
+
                 # 画像生成プロンプトを作成
-                prompt = self.prompt_loader.render(self.prompt_file, {
-                    "keyword": context.keyword,
-                    "heading": section.heading,
-                    "content": section.content[:200],  # 先頭200文字を使用
-                })
+                prompt = self.prompt_loader.render(
+                    self.prompt_file,
+                    {
+                        "keyword": context.keyword,
+                        "heading": section.heading,
+                        "content": section.content[:200],  # 先頭200文字を使用
+                    },
+                )
 
                 from ai_writing.services.llm.base import LLMFactory
+
                 llm_config = self.config.llm.model_dump(exclude={"provider"})
                 llm = LLMFactory.create(self.config.llm.provider, **llm_config)
 
-                image_prompt = await llm.generate(
-                    prompt["user"],
-                    system_prompt=prompt["system"]
-                )
+                image_prompt = await llm.generate(prompt["user"], system_prompt=prompt["system"])
 
                 # 画像を生成
                 result: ImageGenerationResult = await generator.generate_with_cache(
@@ -136,11 +156,18 @@ class ImageGenerationStage(BaseStage):
                 # 対応するセクションに画像パスを設定
                 context.sections[idx].image_path = result.url
 
-                print(f"  画像生成: {section.heading}")
+                cache_status = (
+                    "[green]✓ キャッシュ使用[/green]"
+                    if result.cached
+                    else "[blue]✓ 生成完了[/blue]"
+                )
+                console.print(f"    {cache_status} - {section.heading}")
 
             except Exception as e:
-                print(f"  画像生成エラー ({section.heading}): {e}")
-                continue
+                console.print(f"    [red]✗ エラー ({section.heading}): {e}[/red]")
+                raise ImageGenerationError(
+                    f"画像生成に失敗しました: {section.heading}", provider=provider
+                ) from e
 
         context.images = images
         return context

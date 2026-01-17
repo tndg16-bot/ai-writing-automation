@@ -10,6 +10,11 @@ from ai_writing.services.image.dalle import DALLEGenerator
 from ai_writing.services.image.gemini import GeminiGenerator
 from ai_writing.services.image.midjourney import MidjourneyGenerator
 from ai_writing.services.image.canva import CanvaGenerator
+from ai_writing.services.image.fallback import (
+    FallbackImageGenerator,
+    WeightedFallbackGenerator,
+    create_fallback_generator,
+)
 
 __all__ = [
     "BaseImageGenerator",
@@ -20,5 +25,7 @@ __all__ = [
     "GeminiGenerator",
     "MidjourneyGenerator",
     "CanvaGenerator",
+    "FallbackImageGenerator",
+    "WeightedFallbackGenerator",
+    "create_fallback_generator",
 ]
-

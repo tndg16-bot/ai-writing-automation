@@ -5,9 +5,14 @@ llm:
   model: "gpt-4"
   temperature: 0.7
   max_tokens: 4096
+  max_retries: 3  # レートリミット時の最大再試行回数
 
 image:
   default_provider: "dalle"
+  fallback_chain:  # フォールバックプロバイダーの順序
+    - "dalle"
+    - "gemini"
+    - "midjourney"
   providers:
     dalle:
       enabled: true
@@ -17,8 +22,18 @@ image:
       model: "imagen-3"
     midjourney:
       enabled: false
+      bot_token: "${DISCORD_BOT_TOKEN}"  # Discord bot token
+      server_id: "${DISCORD_SERVER_ID}"  # Discord server ID
+      channel_id: "${MIDJOURNEY_CHANNEL_ID}"  # Midjourney channel ID
+      style_params: "--v 6 --style raw"  # Midjourneyパラメータ
+      timeout: 300  # タイムアウト（秒）
+      poll_interval: 2  # ポーリング間隔（秒）
     canva:
       enabled: false
+      api_key: "${CANVA_API_KEY}"  # Canva API key
+      template_id: "${CANVA_TEMPLATE_ID}"  # デフォルトテンプレートID
+      export_format: "png"  # エクスポート形式 (png, pdf)
+      timeout: 60  # タイムアウト（秒）
 
 image_insertion:
   after_h2: true
@@ -29,5 +44,20 @@ image_insertion:
 google_docs:
   template_folder: "./templates"
   output_folder_id: null  # Google DriveフォルダID
+
+# 履歴管理設定
+database:
+  enabled: true
+  path: "./data/history.db"  # SQLiteデータベースファイルパス
+
+# キャッシュ設定
+cache:
+  llm:
+    enabled: true
+    path: "./cache/llm"  # LLMキャッシュディレクトリ
+    ttl: 86400  # TTL（秒）、デフォルト24時間
+  image:
+    enabled: true
+    path: "./cache/images"  # 画像キャッシュディレクトリ
 
 prompts_folder: "./prompts"

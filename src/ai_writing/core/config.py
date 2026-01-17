@@ -71,7 +71,9 @@ class Config(BaseModel):
         return cls(**data)
 
     @classmethod
-    def load_with_client(cls, config_path: Path | str, client_path: Path | str | None = None) -> "Config":
+    def load_with_client(
+        cls, config_path: Path | str, client_path: Path | str | None = None
+    ) -> "Config":
         """メイン設定とクライアント設定をマージして読み込む"""
         config = cls.load(config_path)
 
@@ -96,8 +98,11 @@ class EnvSettings(BaseSettings):
     google_client_id: str = ""
     google_client_secret: str = ""
     google_redirect_uri: str = ""
-    midjourney_token: str = ""
+    discord_bot_token: str = ""
+    discord_server_id: str = ""
+    midjourney_channel_id: str = ""
     canva_api_key: str = ""
+    canva_template_id: str = ""
 
     class Config:
         env_file = ".env"

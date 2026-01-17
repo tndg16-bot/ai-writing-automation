@@ -4,8 +4,8 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from pydantic import BaseModel, Field
-from pydantic_settings import BaseSettings
+from pydantic import BaseModel, ConfigDict, Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class LLMConfig(BaseModel):
@@ -71,7 +71,9 @@ class Config(BaseModel):
         return cls(**data)
 
     @classmethod
-    def load_with_client(cls, config_path: Path | str, client_path: Path | str | None = None) -> "Config":
+    def load_with_client(
+        cls, config_path: Path | str, client_path: Path | str | None = None
+    ) -> "Config":
         """メイン設定とクライアント設定をマージして読み込む"""
         config = cls.load(config_path)
 
@@ -110,7 +112,8 @@ class EnvSettings(BaseSettings):
     midjourney_token: str = ""
     canva_api_key: str = ""
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        extra = "ignore"
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )

@@ -1,4 +1,5 @@
 """Blog Pipeline - ブログ記事生成パイプライン"""
+
 from typing import Any
 
 from ai_writing.core.config import Config
@@ -27,7 +28,7 @@ class BlogPipeline(BasePipeline):
             LeadStage(self.config),
             BodyStage(self.config),
             SummaryStage(self.config),
-            # DocsOutputStage(self.config),  # Google認証が必要なため一時無効
+            DocsOutputStage(self.config),
         ]
 
         # 画像生成はデフォルトでは無効（クライアント設定で有効化）

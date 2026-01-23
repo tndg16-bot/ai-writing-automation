@@ -182,13 +182,14 @@ MIT License - 自由に使用・改変・配布できます。
 - **GitHub Repository**: https://github.com/tndg16-bot/ai-writing-automation
 - **Issues**: https://github.com/tndg16-bot/ai-writing-automation/issues
 - **Discussions**: https://github.com/tndg16-bot/ai-writing-automation/discussions
+- **Project Status**: [PROJECT_STATUS.md](PROJECT_STATUS.md) - 進捗状況の全体図
 
 ---
 
-## 🌐 本番環境（デプロイ予定）
+## 🌐 本番環境（デプロイ準備完了）
 
-- **フロントエンド**: Vercel（予定）
-- **バックエンド**: Railway（予定）
+- **フロントエンド**: Vercel（準備完了）
+- **バックエンド**: Railway（準備完了）
 
 本番環境へのデプロイ方法は [Deployment Guide](docs/DEPLOYMENT.md) を参照してください。
 

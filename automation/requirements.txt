@@ -1,0 +1,2 @@
+# APScheduler for scheduled tasks
+apscheduler>=3.10.0

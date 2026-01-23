@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  backend:
+    name: Backend Tests
+    uses: ./.github/workflows/backend-ci.yml
+    secrets: inherit
+
+  frontend:
+    name: Frontend Tests
+    uses: ./.github/workflows/frontend-ci.yml
+    secrets: inherit
+
+  e2e:
+    name: E2E Tests
+    needs: [backend, frontend]
+    uses: ./.github/workflows/e2e-tests.yml
+    secrets: inherit
+
+  status:
+    name: CI Status
+    needs: [backend, frontend, e2e]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+    - name: Check all jobs
+      run: |
+        if [ "${{ needs.backend.result }}" != "success" ]; then
+          echo "Backend tests failed"
+          exit 1
+        fi
+        if [ "${{ needs.frontend.result }}" != "success" ]; then
+          echo "Frontend tests failed"
+          exit 1
+        fi
+        if [ "${{ needs.e2e.result }}" != "success" ]; then
+          echo "E2E tests failed"
+          exit 1
+        fi
+        echo "All jobs passed!"

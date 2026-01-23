@@ -1,0 +1,8 @@
+# FastAPI for AI Writing Automation API
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+websockets>=12.0
+python-multipart>=0.0.6
+
+# Note: Dependencies from src/ai_writing are already installed
+# via the main pyproject.toml

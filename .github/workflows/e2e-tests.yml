@@ -1,0 +1,114 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'frontend/**'
+      - 'api/**'
+      - 'src/**'
+      - 'e2e/**'
+      - '.github/workflows/e2e-tests.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'frontend/**'
+      - 'api/**'
+      - 'src/**'
+      - 'e2e/**'
+
+jobs:
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install Python dependencies
+      run: |
+        cd api
+        pip install -e ".[dev]"
+
+    - name: Install Node dependencies
+      run: |
+        cd frontend
+        npm ci
+
+    - name: Install Playwright browsers
+      run: |
+        cd frontend
+        npx playwright install --with-deps chromium
+        npx playwright install-deps
+
+    - name: Start API server
+      run: |
+        cd api
+        python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
+        echo "Waiting for API to be ready..."
+        timeout 60 bash -c "until curl -sSf http://localhost:8000/health > /dev/null; do sleep 2; done"
+        echo "API is ready"
+
+    - name: Start Frontend server
+      run: |
+        cd frontend
+        npm run dev &
+        echo "Waiting for Frontend to be ready..."
+        timeout 60 bash -c "until curl -sSf http://localhost:3000 > /dev/null; do sleep 2; done"
+        echo "Frontend is ready"
+
+    - name: Run Playwright tests
+      run: |
+        npx playwright test --shard=${{ matrix.shard }}/4
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-results-${{ matrix.shard }}
+        path: playwright-report/
+        retention-days: 7
+
+    - name: Upload test screenshots
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: playwright-screenshots-${{ matrix.shard }}
+        path: test-results/
+        retention-days: 7
+
+    - name: Upload test videos
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: playwright-videos-${{ matrix.shard }}
+        path: test-results/
+        retention-days: 7
+
+    - name: Upload Playwright trace
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-trace-${{ matrix.shard }}
+        path: playwright-report/trace.zip
+        retention-days: 7

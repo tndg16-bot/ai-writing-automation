@@ -1,0 +1,29 @@
+# API Project - Phase 10 FastAPI Backend
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ai-writing-api"
+version = "0.1.0"
+description = "FastAPI backend for AI Writing Automation"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "websockets>=12.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "python-multipart>=0.0.6",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "httpx>=0.25.0",
+    "httpx[websocket]>=0.25.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]

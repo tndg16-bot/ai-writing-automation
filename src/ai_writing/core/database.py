@@ -147,58 +147,55 @@ class Database:
                 ),
             )
 
-            return cursor.lastrowid
+            rowid = cursor.lastrowid
+            return rowid if rowid is not None else 0
 
-    def get_generation(self, generation_id: int) -> Optional[dict[str, Any]]:
-        """Get generation by ID
+    def save_image(self, image_data: dict[str, Any]) -> int:
+        """Save an image record
 
         Args:
-            generation_id: Generation ID
+            image_data: Image data dictionary
 
         Returns:
-            Generation data or None
+            Image ID
         """
         with self._get_connection() as conn:
             cursor = conn.cursor()
 
             cursor.execute(
                 """
-                SELECT * FROM generations WHERE id = ?
+                INSERT INTO images (
+                    generation_id, url, provider, model, prompt, section_heading, cached
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
-                (generation_id,),
+                (
+                    image_data["generation_id"],
+                    image_data["url"],
+                    image_data["provider"],
+                    image_data.get("model"),
+                    image_data.get("prompt"),
+                    image_data.get("section_heading"),
+                    image_data.get("cached", False),
+                ),
             )
 
-            row = cursor.fetchone()
-            if row is None:
-                return None
-
-            return {
-                "id": row["id"],
-                "keyword": row["keyword"],
-                "content_type": row["content_type"],
-                "title": row["title"],
-                "lead": row["lead"],
-                "sections_count": row["sections_count"],
-                "images_count": row["images_count"],
-                "created_at": row["created_at"],
-                "client_config": json.loads(row["client_config"]) if row["client_config"] else {},
-                "raw_responses": json.loads(row["raw_responses"]) if row["raw_responses"] else {},
-            }
+            rowid = cursor.lastrowid
+            return rowid if rowid is not None else 0
 
     def list_generations(
         self,
         keyword: Optional[str] = None,
         content_type: Optional[str] = None,
-        limit: int = 50,
+        limit: int = 100,
         offset: int = 0,
     ) -> list[dict[str, Any]]:
-        """List generations with optional filters
+        """List generation records with optional filters
 
         Args:
-            keyword: Filter by keyword (partial match)
+            keyword: Filter by keyword
             content_type: Filter by content type
-            limit: Maximum number of results
-            offset: Offset for pagination
+            limit: Maximum number of records to return
+            offset: Number of records to skip
 
         Returns:
             List of generation records
@@ -206,7 +203,11 @@ class Database:
         with self._get_connection() as conn:
             cursor = conn.cursor()
 
-            query = "SELECT * FROM generations WHERE 1=1"
+            # Build query
+            query = """
+                SELECT * FROM generations
+                WHERE 1=1
+            """
             params = []
 
             if keyword:
@@ -235,68 +236,68 @@ class Database:
                     "created_at": row["created_at"],
                     "client_config": json.loads(row["client_config"])
                     if row["client_config"]
-                    else {},
+                    else None,
                     "raw_responses": json.loads(row["raw_responses"])
                     if row["raw_responses"]
-                    else {},
+                    else None,
                 }
                 for row in rows
             ]
 
-    def delete_generation(self, generation_id: int) -> bool:
-        """Delete generation by ID
+    def get_generation(self, generation_id: int) -> Optional[dict[str, Any]]:
+        """Get a generation record by ID
 
         Args:
             generation_id: Generation ID
 
         Returns:
-            True if deleted, False otherwise
+            Generation record or None
         """
         with self._get_connection() as conn:
             cursor = conn.cursor()
 
             cursor.execute(
                 """
-                DELETE FROM generations WHERE id = ?
+                SELECT * FROM generations WHERE id = ?
             """,
                 (generation_id,),
             )
 
-            return cursor.rowcount > 0
+            row = cursor.fetchone()
+            if row is None:
+                return None
 
-    # CRUD Operations for Images
+            return {
+                "id": row["id"],
+                "keyword": row["keyword"],
+                "content_type": row["content_type"],
+                "title": row["title"],
+                "lead": row["lead"],
+                "sections_count": row["sections_count"],
+                "images_count": row["images_count"],
+                "created_at": row["created_at"],
+                "client_config": json.loads(row["client_config"]) if row["client_config"] else None,
+                "raw_responses": json.loads(row["raw_responses"]) if row["raw_responses"] else None,
+            }
 
-    def save_image(self, image_data: dict[str, Any]) -> int:
-        """Save an image record
+    def delete_generation(self, generation_id: int) -> bool:
+        """Delete a generation record by ID
 
         Args:
-            image_data: Image data dictionary
+            generation_id: Generation ID
 
         Returns:
-            Image ID
+            True if deleted, False if not found
         """
         with self._get_connection() as conn:
             cursor = conn.cursor()
 
             cursor.execute(
-                """
-                INSERT INTO images (
-                    generation_id, url, provider, model,
-                    prompt, section_heading, cached
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
-            """,
-                (
-                    image_data["generation_id"],
-                    image_data["url"],
-                    image_data["provider"],
-                    image_data.get("model"),
-                    image_data.get("prompt"),
-                    image_data.get("section_heading"),
-                    image_data.get("cached", False),
-                ),
+                "DELETE FROM generations WHERE id = ?",
+                (generation_id,),
             )
 
-            return cursor.lastrowid
+            return cursor.rowcount > 0
 
     def get_images(self, generation_id: int) -> list[dict[str, Any]]:
         """Get images for a generation
@@ -360,7 +361,8 @@ class Database:
                 ),
             )
 
-            return cursor.lastrowid
+            rowid = cursor.lastrowid
+            return rowid if rowid is not None else 0
 
     def get_versions(self, generation_id: int) -> list[dict[str, Any]]:
         """Get versions for a generation

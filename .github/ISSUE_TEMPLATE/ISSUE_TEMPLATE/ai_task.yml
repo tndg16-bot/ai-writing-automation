@@ -1,0 +1,70 @@
+name: 🤖 AIエージェント向けタスク
+description: AIエージェントに割り当てるタスクを作成します
+title: "[AI] "
+labels: ["ai-task", "status: task-assigned"]
+assignees: []
+
+body:
+  - type: dropdown
+    id: agent
+    attributes:
+      label: 担当エージェント
+      description: このタスクを担当するAIエージェントを選択
+      options:
+        - Antigravity (PM)
+        - Claude Code
+        - Codex CLI
+        - Gemini CLI
+    validations:
+      required: true
+
+  - type: textarea
+    id: objective
+    attributes:
+      label: 🎯 目的
+      description: このタスクで達成したいこと
+      placeholder: |
+        例: ログイン機能のバグを修正する
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-outcome
+    attributes:
+      label: ✅ 期待する成果
+      description: 完了時に満たすべき条件（チェックリスト形式）
+      placeholder: |
+        - [ ] ログインが正常に動作する
+        - [ ] エラーメッセージが適切に表示される
+        - [ ] テストが通る
+    validations:
+      required: true
+
+  - type: textarea
+    id: constraints
+    attributes:
+      label: 🚫 制約・禁止事項
+      description: やってはいけないこと、守るべきルール
+      placeholder: |
+        - 既存のAPIの仕様を変更しない
+        - パッケージの追加はPM承認後
+
+  - type: textarea
+    id: reference-files
+    attributes:
+      label: 📁 参照ファイル
+      description: 関連するファイルパス
+      placeholder: |
+        - `Apps/portfolio/src/components/LoginForm.tsx`
+        - `Apps/portfolio/src/lib/auth.ts`
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 優先度
+      options:
+        - 🔴 高 (今日中)
+        - 🟠 中 (今週中)
+        - 🟢 低 (余裕があれば)
+    validations:
+      required: true

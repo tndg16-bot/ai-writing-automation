@@ -73,6 +73,7 @@ python -m ai_writing generate "AI副業" --content-type blog
 | **[Complete Guide](docs/COMPLETE_GUIDE.md)** | 包括的な運用ガイド（2,675行） | 中級者〜上級者 |
 | **[Beginners Guide](docs/BEGINNERS_GUIDE.md)** | 初心者向け完全ガイド | 初心者 |
 | **[User Manual](MANUAL.md)** | 利用マニュアル | 実践ユーザー |
+| **[Deployment Guide](docs/DEPLOYMENT.md)** | 本番環境デプロイガイド | 運用担当者 |
 | **[Requirements](REQUIREMENTS.md)** | 要件定義書 | 開発者 |
 | **[Architecture](ARCHITECTURE.md)** | アーキテクチャ設計書 | 開発者 |
 | **[Roadmap](ROADMAP.md)** | 開発ロードマップ | プロジェクト管理 |
@@ -181,6 +182,15 @@ MIT License - 自由に使用・改変・配布できます。
 - **GitHub Repository**: https://github.com/tndg16-bot/ai-writing-automation
 - **Issues**: https://github.com/tndg16-bot/ai-writing-automation/issues
 - **Discussions**: https://github.com/tndg16-bot/ai-writing-automation/discussions
+
+---
+
+## 🌐 本番環境（デプロイ予定）
+
+- **フロントエンド**: Vercel（予定）
+- **バックエンド**: Railway（予定）
+
+本番環境へのデプロイ方法は [Deployment Guide](docs/DEPLOYMENT.md) を参照してください。
 
 ---
 

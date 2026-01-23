@@ -1,0 +1,18 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - phase-4-youtube-yukkuri
+
+jobs:
+  verify:
+    name: Verify Deployment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for deployments
+        run: |
+          echo "Railway and Vercel will auto-deploy on push."
+          echo "Please verify deployment manually:"
+          echo "1. Railway: https://railway.app"
+          echo "2. Vercel: https://vercel.com"

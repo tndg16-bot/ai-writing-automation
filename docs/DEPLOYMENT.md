@@ -1,273 +1,244 @@
-# Production Deployment Guide
+# デプロイメントガイド
 
-## Deploying AI Writing Automation to Production
+## 概要
 
-This guide covers deploying to **Vercel (frontend)** and **Railway (backend)**.
+本プロジェクトは以下のプラットフォームでデプロイされます：
 
----
+- **バックエンド**: Railway（Python FastAPI + WebSocket）
+- **フロントエンド**: Vercel（Next.js 14）
 
-## Prerequisites
+## プラットフォーム選定理由
 
-- GitHub account
-- Vercel account (sign up at https://vercel.com)
-- Railway account (sign up at https://railway.app)
-- Required API keys:
-  - `OPENAI_API_KEY`
-  - Optional: Google API keys for Docs integration
+| 要件 | Railway | Vercel |
+|------|---------|--------|
+| Pythonサポート | ✅ ネイティブ | ⚠️ 関数のみ |
+| WebSocket | ✅ 完全サポート | ❌ 未サポート |
+| Next.js | ✅ サポート | ✅ 最適化済み |
+| 無料枠 | ✅ $5/月相当 | ✅ 無制限 |
+| デプロイ速度 | ⚠️ 遅い | ✅ 速い |
+| HTTPS | ✅ 自動 | ✅ 自動 |
 
----
+## 前提条件
 
-## Part 1: Backend Deployment (Railway)
+1. GitHubリポジトリ: `https://github.com/tndg16-bot/ai-writing-automation`
+2. ブランチ: `phase-4-youtube-yukkuri`
+3. 環境変数:
+   - `OPENAI_API_KEY` (Railway)
 
-### Step 1: Create Railway Project
+## ステップ1: Railway（バックエンド）にデプロイ
 
-1. Go to https://railway.app
-2. Click "New Project"
-3. Click "Deploy from GitHub repo"
-4. Select `tndg16-bot/ai-writing-automation`
-5. Railway will detect Python automatically
+### 1-1. Railwayプロジェクト作成
 
-### Step 2: Configure Build Settings
+1. [Railway](https://railway.app) にアクセスし、GitHubでログイン
+2. "New Project" → "Deploy from GitHub repo" を選択
+3. リポジトリ `tndg16-bot/ai-writing-automation` を選択
+4. ブランチ `phase-4-youtube-yukkuri` を選択
+5. "Deploy" をクリック
 
-1. Select the detected service
-2. Configure root directory: `.`
-3. Build command:
-   ```bash
-   pip install -e ".[dev]"
+### 1-2. 環境変数設定
+
+1. Railwayプロジェクトの "Variables" タブに移動
+2. 以下の変数を追加:
    ```
-4. Start command:
-   ```bash
-   python -m uvicorn api.main:app --host 0.0.0.0 --port $PORT
+   OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxx
    ```
 
-### Step 3: Add Environment Variables
+### 1-3. Railway URLの取得
 
-Add these environment variables in Railway:
+1. Railwayプロジェクトの "Settings" → "Domains" に移動
+2. 割り当てられたURLをメモ:
+   ```
+   https://ai-writing-api.railway.app
+   ```
 
-| Variable | Value | Required |
-|----------|--------|----------|
-| `OPENAI_API_KEY` | Your OpenAI API key | Yes |
-| `DATABASE_URL` | `sqlite:///./data/history.db` | No (default) |
-| `PORT` | `8000` | No (auto) |
+### 1-4. 自動デプロイ設定
 
-To add variables:
-1. Go to your service in Railway
-2. Click "Variables" tab
-3. Add each variable
+1. Railwayプロジェクトの "Settings" → "GitHub"
+2. "Automatic Deploys" を有効にする
+3. `phase-4-youtube-yukkuri` ブランチを設定
 
-### Step 4: Deploy
+## ステップ2: Vercel（フロントエンド）にデプロイ
 
-1. Click "Deploy" button
-2. Wait for deployment to complete
-3. Railway will provide a URL like: `https://your-app-name.railway.app`
+### 2-1. Vercelプロジェクト作成
 
-### Step 5: Get Railway URL
+1. [Vercel](https://vercel.com) にアクセスし、GitHubでログイン
+2. "Add New..." → "Project" を選択
+3. GitHubリポジトリをインポート:
+   - `tndg16-bot/ai-writing-automation`
+4. プロジェクト設定:
+   - **Framework Preset**: Next.js
+   - **Root Directory**: `./frontend`
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `.next`
 
-1. Note your Railway URL
-2. Example: `https://ai-writing-api.railway.app`
+### 2-2. 環境変数設定
 
----
+1. Vercelプロジェクトの "Settings" → "Environment Variables" に移動
+2. 以下の変数を追加:
+   ```
+   NEXT_PUBLIC_API_URL=https://ai-writing-api.railway.app
+   ```
+   ※ `https://ai-writing-api.railway.app` は実際のRailway URLに置き換えてください
 
-## Part 2: Frontend Deployment (Vercel)
+### 2-3. デプロイ実行
 
-### Step 1: Install Vercel CLI
+1. "Deploy" ボタンをクリック
+2. デプロイが完了したら、Vercel URLをメモ:
+   ```
+   https://ai-writing-automation.vercel.app
+   ```
 
-```bash
-npm i -g vercel
-```
+### 2-4. 自動デプロイ設定
 
-### Step 2: Deploy to Vercel
+1. Vercelプロジェクトの "Settings" → "Git"
+2. "Auto-Deploy" を有効にする
+3. `phase-4-youtube-yukkuri` ブランチを設定
 
-From the project root:
+## ステップ3: デプロイの確認
 
-```bash
-cd frontend
-vercel
-```
-
-Follow the prompts:
-1. Link to existing project or create new
-2. Set project name (e.g., `ai-writing-automation`)
-3. Override settings? **No** (use defaults)
-
-### Step 3: Configure Environment Variables
-
-After initial deployment, configure the API URL:
-
-1. Go to https://vercel.com
-2. Select your project
-3. Go to **Settings** → **Environment Variables**
-4. Add variable:
-   - Name: `NEXT_PUBLIC_API_URL`
-   - Value: Your Railway URL (e.g., `https://your-api.railway.app`)
-   - Environments: Production, Preview, Development
-
-### Step 4: Redeploy
-
-1. Go to **Deployments** in Vercel
-2. Click the three dots (...) on latest deployment
-3. Click "Redeploy"
-4. Wait for redeployment to complete
-
-### Step 5: Get Vercel URL
-
-Vercel will provide a URL like: `https://your-project-name.vercel.app`
-
----
-
-## Part 3: Update CORS (if needed)
-
-If you experience CORS issues, update `api/main.py`:
-
-```python
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "https://your-project-name.vercel.app",  # Your Vercel domain
-        "http://localhost:3000",  # For local development
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-```
-
-Then push changes and redeploy Railway.
-
----
-
-## Part 4: Verify Deployment
-
-### Test API (Railway)
+### 3-1. バックエンドヘルスチェック
 
 ```bash
-curl https://your-api.railway.app/health
+curl https://ai-writing-api.railway.app/health
 ```
 
-Expected response:
+期待される応答:
 ```json
-{"status": "ok"}
+{"status":"ok","version":"0.2.0"}
 ```
 
-### Test Frontend (Vercel)
+### 3-2. フロントエンドアクセス
 
-1. Visit your Vercel URL
-2. Check dashboard loads
-3. Try creating a generation
+ブラウザで以下のURLにアクセス:
+```
+https://ai-writing-automation.vercel.app
+```
 
-### Check Connectivity
+### 3-3. API連携確認
 
-1. Open browser DevTools (F12)
-2. Go to Network tab
-3. Try creating content
-4. Verify API requests succeed (status 200)
+1. フロントエンドで記事生成を試す
+2. WebSocket通信が正常に動作していることを確認
 
----
+## ステップ4: カスタムドメイン設定（オプション）
 
-## Part 5: Custom Domain (Optional)
+### 4-1. Vercelにカスタムドメインを追加
 
-### Vercel Custom Domain
+1. Vercelプロジェクトの "Settings" → "Domains"
+2. カスタムドメインを追加:
+   ```
+   ai-writing.yourdomain.com
+   ```
+3. DNS設定を指示に従って更新
 
-1. Go to Vercel project **Settings**
-2. Go to **Domains**
-3. Add your domain (e.g., `ai-writing.yourdomain.com`)
-4. Follow DNS instructions
+### 4-2. Railwayにカスタムドメインを追加
 
-### Railway Custom Domain
+1. Railwayプロジェクトの "Settings" → "Domains"
+2. API用のカスタムドメインを追加:
+   ```
+   api.yourdomain.com
+   ```
+3. DNS設定を指示に従って更新
 
-1. Go to Railway service **Settings**
-2. Go to **Networking**
-3. Click "Generate Domain" or "Custom Domain"
-4. Follow DNS instructions
+## トラブルシューティング
 
----
+### 問題1: Railwayデプロイが失敗する
 
-## Troubleshooting
+**症状**: Build failing
 
-### Issue: CORS Error
+**原因**:
+- `Procfile` が正しく設定されていない
+- Pythonの依存関係がインストールできない
 
-**Symptom**: Browser shows CORS error in console
+**解決策**:
+1. `api/requirements.txt` を確認
+2. `Procfile` を確認:
+   ```
+   web: uvicorn api.main:app --host 0.0.0.0 --port $PORT
+   ```
+3. RailwayのLogsを確認
 
-**Solution**:
-1. Verify `NEXT_PUBLIC_API_URL` in Vercel
-2. Update CORS origins in `api/main.py`
-3. Redeploy Railway
+### 問題2: Vercelデプロイが失敗する
 
-### Issue: API Not Found
+**症状**: Build failing
 
-**Symptom**: 404 error when calling API
+**原因**:
+- `NEXT_PUBLIC_API_URL` が設定されていない
+- 依存関係が正しくインストールできない
 
-**Solution**:
-1. Check Railway service is running
-2. Verify PORT is set correctly
-3. Check Railway logs for errors
+**解決策**:
+1. VercelのEnvironment Variablesを確認
+2. `frontend/package.json` を確認
+3. `next.config.js` を確認
 
-### Issue: Build Fails
+### 問題3: APIリクエストがCORSエラーになる
 
-**Symptom**: Vercel or Railway build fails
+**症状**: CORS policy error
 
-**Solution**:
-1. Check build logs
-2. Verify all dependencies are in requirements.txt
-3. Ensure Python/Node versions are compatible
+**原因**:
+- CORS設定が正しくない
+- Railway URLが正しく設定されていない
 
-### Issue: WebSocket Not Connecting
+**解決策**:
+1. `api/main.py` のCORS設定を確認:
+   ```python
+   app.add_middleware(
+       CORSMiddleware,
+       allow_origins=["*"],  # 本番環境ではドメインを指定
+       allow_credentials=True,
+       allow_methods=["*"],
+       allow_headers=["*"],
+   )
+   ```
+2. `NEXT_PUBLIC_API_URL` を確認
 
-**Symptom**: Progress page doesn't show updates
+### 問題4: WebSocket接続が失敗する
 
-**Solution**:
-1. Check Railway supports WebSockets (enabled by default)
-2. Verify WebSocket URL is correct
-3. Check browser console for errors
+**症状**: WebSocket connection failed
 
----
+**原因**:
+- RailwayがWebSocketをサポートしていない
+- CORS設定が間違っている
 
-## Monitoring
+**解決策**:
+1. RailwayのWebSocket対応を確認
+2. `NEXT_PUBLIC_API_URL` が `ws://` または `wss://` であることを確認
 
-### Vercel
+## 費用見積もり
 
-- **Deployments**: https://vercel.com/dashboard
-- **Analytics**: https://vercel.com/analytics
-- **Logs**: https://vercel.com/dashboard → Your Project → Logs
+### 無料枠
+
+- **Vercel**: 無料枠無制限
+- **Railway**: $5/月相当（1プロジェクト、512MB RAM、500時間/月）
+
+### 有料プラン
+
+- **Vercel Pro**: $20/月（本番運用推奨）
+- **Railway Starter**: $5/月（無制限プロジェクト、1GB RAM）
+
+## 監視とログ
 
 ### Railway
 
-- **Deployments**: https://railway.app/dashboard
-- **Metrics**: Railway service → Metrics
-- **Logs**: Railway service → Logs
+- **Logs**: Real-time deployment logs
+- **Metrics**: CPU, Memory, Network
+- **Alerts**: Uptime monitoring
 
----
+### Vercel
 
-## Cost Estimate
+- **Analytics**: Web Vitals, traffic
+- **Logs**: Build and deployment logs
+- **Speed Insights**: Core Web Vitals
 
-### Vercel (Free Tier)
-- 100GB bandwidth/month
-- Unlimited deployments
-- Edge network
-- **Cost**: $0/month
+## 次のステップ
 
-### Railway (Free Tier)
-- 500 hours/month
-- 512MB RAM
-- Shared CPU
-- **Cost**: $0/month (plus $5/month for Hobby tier)
+1. **監視設定**: Uptime monitoring, error tracking
+2. **バックアップ**: Database backups, disaster recovery
+3. **スケーリング**: Auto-scaling, CDN
+4. **セキュリティ**: HTTPS, rate limiting, auth
 
-Total estimated cost: **$0-$5/month**
+## 参考リンク
 
----
-
-## Next Steps
-
-1. Deploy both services
-2. Test end-to-end functionality
-3. Set up monitoring/alerts
-4. Configure custom domains (optional)
-5. Set up backups (recommended)
-
----
-
-## Support
-
-- **Vercel Docs**: https://vercel.com/docs
-- **Railway Docs**: https://docs.railway.app
-- **GitHub Issues**: https://github.com/tndg16-bot/ai-writing-automation/issues
+- [Railway Documentation](https://railway.app/docs)
+- [Vercel Documentation](https://vercel.com/docs)
+- [Next.js Deployment](https://nextjs.org/docs/deployment)
+- [FastAPI Deployment](https://fastapi.tiangolo.com/deployment/)

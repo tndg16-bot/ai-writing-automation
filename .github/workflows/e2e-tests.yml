@@ -2,7 +2,7 @@ name: E2E Tests
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, phase-4-youtube-yukkuri ]
     paths:
       - 'frontend/**'
       - 'api/**'

@@ -2,7 +2,7 @@ name: Frontend CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, phase-4-youtube-yukkuri ]
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-ci.yml'

@@ -2,7 +2,7 @@ name: Backend CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, phase-4-youtube-yukkuri ]
     paths:
       - 'api/**'
       - 'src/**'

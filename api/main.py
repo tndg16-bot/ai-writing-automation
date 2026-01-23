@@ -35,7 +35,7 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # TODO: Configure properly for production
+    allow_origins=["*"],  # For Railway + Vercel deployment
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

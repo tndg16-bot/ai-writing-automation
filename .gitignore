@@ -57,6 +57,10 @@ config/clients/*.yaml
 credentials/
 *.json
 !templates/*.json
+!vercel.json
+!railway.json
+!package.json
+!package-lock.json
 output/
 cache/
 logs/
